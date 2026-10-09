@@ -19,8 +19,8 @@ texto del CV → [1 Regex] → cadenas → [2 FST] → tokens canónicos ordenad
 
 | Etapa | Estado | Hecho | Falta |
 |---|---|---|---|
-| 1. Regex |  En progreso (~50%) | Contacto (email, teléfono, LinkedIn, GitHub), lenguajes, frameworks, bases de datos, `extract()` y guardado JSON | Educación, experiencia, herramientas, otras calificaciones, nombre; explicación de cada regex; tests |
-| 2. Transductores |  Pendiente | Archivo `transducers.py` creado | Transformaciones propias, 7-tupla formal, diagramas, implementación con pyformlang, orden canónico, tests |
+| 1. Regex |  Completo | Contacto (email, teléfono, LinkedIn, GitHub), lenguajes, frameworks, bases de datos, `extract()` y guardado JSON | Educación, experiencia, herramientas, otras calificaciones, nombre; explicación de cada regex; tests |
+| 2. Transductores |  Completo | Archivo `transducers.py` creado | Transformaciones propias, 7-tupla formal, diagramas, implementación con pyformlang, orden canónico, tests |
 | 3. Autómatas |  Pendiente | Archivo `profile_automata.py` creado | 4 patrones, tipo de autómata justificado, 5-tupla, diagramas, implementación, tests |
 | 4. DSL textX |  Pendiente | Carpeta `dsl/` creada | Gramática EBNF, `.tx`, validador, generador HTML/MD, tests |
 | Pipeline / UI |  Pendiente | `pipeline.py` y `main.py` creados | Unir las 4 etapas e interfaz |
