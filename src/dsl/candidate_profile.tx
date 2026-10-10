@@ -1,0 +1,34 @@
+//Tbh this is the only easy part, Made by Szztur
+
+
+CandidateProfile:
+    'candidate' '{'
+        ('name' ':' name=STRING ';')?
+        'contact' '{' contacts*=ContactEntry '}'
+        'qualifications' '{' groups*=QualificationGroup '}'
+        'background' '{' background*=BackgroundEntry '}'
+        'classification' '{' results+=ProfileResult '}'
+    '}'
+;
+
+ContactEntry:
+    kind=ContactKind ':' value=STRING ';'
+;
+ContactKind: 'email' | 'phone' | 'linkedin' | 'github';
+
+
+QualificationGroup:
+    kind=QualificationKind ':' '[' tokens*=ID[','] ']' ';'
+;
+QualificationKind: 'languages' | 'frameworks' | 'databases' | 'tools' | 'other_qualifications';
+
+BackgroundEntry:
+    kind=BackgroundKind ':' '[' items*=STRING[','] ']' ';'
+;
+BackgroundKind: 'education' | 'experience';
+
+// Resultado de la Etapa 3 para cada perfil.
+ProfileResult:
+    'profile' profile=ID ':' verdict=Verdict ';'
+;
+Verdict: 'ACCEPTED' | 'REJECTED';
