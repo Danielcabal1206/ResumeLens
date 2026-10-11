@@ -1,78 +1,83 @@
-"""Validación semántica del modelo textX (lo que la gramática no puede expresar).
+#Im too dumb to program on HTML so the agent helped me with this one. Made by Szztur's Agent lol
 
-Reglas:
-  1. Cada uno de los tokens existe en contracts.CANONICAL
-  2. Cada uno de los tokens esta en el grupo que le corresponde, que vendria siendo CATEGORY_TO_KEY
-  3. No hay grupos ni tokens repetidos
-  4. Hay exactamente un resultado por cada perfil de contracts.PROFILES
-  5. Cada veredicto coincide con el oraculo classify()
-"""
+
 from __future__ import annotations
 
-from resumelens.contracts import CANONICAL, CATEGORY_TO_KEY, PROFILES, classify
+from html import escape
 
-class ProfileValidationError(Exception):
-    def __init__(self, errors: list[str]):
-        self.errors = list(errors)
-        super().__init__("; ".join(self.errors))
+from dsl.validator import matched_profiles
 
+NOTE = ("This report only checks whether the explicit qualifications match a formal "
+        "pattern. It does not rank candidates or make hiring decisions.")
 
-def model_tokens(model) -> list[str]:
-    return [t for g in model.groups for t in g.tokens]
-
-
-def missing_slots(profile: str, tokens: list[str]) -> list[str]:
-    present = set(tokens)
-    return [name for name, opts, req in PROFILES[profile]
-            if req and not present.intersection(opts)]
+def _pretty(profile: str) -> str:
+    return profile.replace("_", " ").title()
 
 
-def validate(model) -> None:
-    errors: list[str] = []
-    tokens: list[str] = []
-    seen_groups: set[str] = set()
-
-    for g in model.groups:
-        if g.kind in seen_groups:
-            errors.append(f"group '{g.kind}' appears more than once")
-        seen_groups.add(g.kind)
-        for t in g.tokens:
-            if t not in CANONICAL:
-                errors.append(f"unknown token '{t}' in '{g.kind}'")
-                continue
-            expected = CATEGORY_TO_KEY[CANONICAL[t][0]]
-            if expected != g.kind:
-                errors.append(f"token '{t}' belongs in '{expected}', not '{g.kind}'")
-            if t in tokens:
-                errors.append(f"token '{t}' is repeated")
-            tokens.append(t)
-
-    declared: dict[str, bool] = {}
-    for r in model.results:
-        if r.profile not in PROFILES:
-            errors.append(f"unknown profile '{r.profile}'")
-        elif r.profile in declared:
-            errors.append(f"profile '{r.profile}' is declared more than once")
-        else:
-            declared[r.profile] = (r.verdict == "ACCEPTED")
-    for p in PROFILES:
-        if p not in declared:
-            errors.append(f"missing classification for profile '{p}'")
-
-    if not errors:  # la coherencia solo tiene sentido con tokens y perfiles bien formados
-        expected = classify(tokens)
-        for p, accepted in declared.items():
-            if accepted == expected[p]:
-                continue
-            if accepted:
-                errors.append(f"{p} declared ACCEPTED but required slots are missing: "
-                              f"{', '.join(missing_slots(p, tokens))}")
-            else:
-                errors.append(f"{p} declared REJECTED but the tokens satisfy the profile")
-
-    if errors:
-        raise ProfileValidationError(errors)
+def _sections(model) -> dict:
+    """Datos comunes a Markdown y HTML."""
+    return {
+        "name": model.name or "Unnamed candidate",
+        "contact": [(c.kind, c.value) for c in model.contacts],
+        "qualifications": [(g.kind, list(g.tokens)) for g in model.groups],
+        "background": [(b.kind, list(b.items)) for b in model.background],
+        "results": [(r.profile, r.verdict) for r in model.results],
+        "matched": matched_profiles(model),
+    }
 
 
-def matched_profiles(model) -> list[str]:
-    return [r.profile for r in model.results if r.verdict == "ACCEPTED"]
+def render_markdown(model) -> str:
+    s = _sections(model)
+    out = [f"# Candidate: {s['name']}", ""]
+    out += ["## Contact", ""] + ([f"- **{k}**: {v}" for k, v in s["contact"]] or ["- (none found)"]) + [""]
+    out += ["## Qualifications", ""]
+    out += [f"- **{k}**: {', '.join(t)}" for k, t in s["qualifications"]] or ["- (none found)"]
+    out += ["", "## Background", ""]
+    out += [f"- **{k}**: {'; '.join(i)}" for k, i in s["background"]] or ["- (none found)"]
+    out += ["", "## Profile match", "", "| Profile | Result |", "|---|---|"]
+    out += [f"| {_pretty(p)} | {v} |" for p, v in s["results"]]
+    matched = ", ".join(_pretty(p) for p in s["matched"]) or "none"
+    out += ["", f"**Matched profiles:** {matched}", "", f"> {NOTE}", ""]
+    return "\n".join(out)
+
+
+def render_html(model) -> str:
+    s = _sections(model)
+    e = escape
+
+    def ul(items: list[str]) -> str:
+        body = "".join(f"<li>{i}</li>" for i in items) or "<li>(none found)</li>"
+        return f"<ul>{body}</ul>"
+
+    rows = "".join(
+        f"<tr><td>{e(_pretty(p))}</td><td class=\"{v.lower()}\">{v}</td></tr>"
+        for p, v in s["results"])
+    matched = e(", ".join(_pretty(p) for p in s["matched"]) or "none")
+    return f"""<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>ResumeLens - {e(s['name'])}</title>
+<style>
+body {{ font-family: sans-serif; max-width: 42rem; margin: 2rem auto; }}
+table {{ border-collapse: collapse; }}
+td, th {{ border: 1px solid #999; padding: .3rem .8rem; }}
+.accepted {{ color: #0a7a2f; font-weight: bold; }}
+.rejected {{ color: #a33; }}
+</style>
+</head>
+<body>
+<h1>Candidate: {e(s['name'])}</h1>
+<h2>Contact</h2>
+{ul([f"<b>{e(k)}</b>: {e(v)}" for k, v in s['contact']])}
+<h2>Qualifications</h2>
+{ul([f"<b>{e(k)}</b>: {e(', '.join(t))}" for k, t in s['qualifications']])}
+<h2>Background</h2>
+{ul([f"<b>{e(k)}</b>: {e('; '.join(i))}" for k, i in s['background']])}
+<h2>Profile match</h2>
+<table><tr><th>Profile</th><th>Result</th></tr>{rows}</table>
+<p><b>Matched profiles:</b> {matched}</p>
+<p><em>{e(NOTE)}</em></p>
+</body>
+</html>
+"""
