@@ -30,6 +30,16 @@ def test_extract_contact_and_experience():
     assert d["email"] == ["wednesday@mail.com"]
     assert d["experience"] == ["3 years of experience"]
     assert d["languages"] == ["JS"] and d["databases"] == ["Postgres"]
+    assert d["tools"] == ["Git"]
+    assert d["frameworks"] == ["React.js", "NodeJS"]
+
+
+def test_extract_education_and_explain():
+    from resumelens.extraction.regex_extractor import explain
+    d = extract("Bachelor of Science in Computer Science\nMaster in Data Science")
+    assert d["education"]
+    keys = explain()
+    assert set(STAGE1_KEYS) <= set(keys)
 
 
 @pytest.mark.parametrize("text", ["we go to the rest of the team", "express thanks", "Go to market"])
@@ -60,6 +70,15 @@ def test_every_variant_roundtrips():
     from resumelens.contracts import VARIANT_TO_TOKEN
     for v, tok in VARIANT_TO_TOKEN.items():
         assert normalize_term(v) == tok
+
+
+def test_fst_formal_definition_and_dot(tmp_path):
+    from resumelens.normalization.transducers import GLOBAL_FST, export_all_dots, formal_definition
+    fd = formal_definition(GLOBAL_FST)
+    assert set(fd) == {"Q", "Sigma", "Gamma", "delta", "omega", "q0", "F"}
+    assert fd["q0"] and fd["F"] and fd["Sigma"]
+    written = export_all_dots(tmp_path)
+    assert written and tmp_path.joinpath("fst_global.dot").read_text().startswith("digraph")
 
 
 def test_canonical_order_independent_of_input_order():

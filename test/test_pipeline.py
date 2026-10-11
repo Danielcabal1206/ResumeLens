@@ -26,3 +26,5 @@ def test_document_example_sequences():
     res = run_pipeline((RESUMES / "fullstack.txt").read_text(encoding="utf-8"))
     assert res["profiles"]["FULL_STACK_DEVELOPER"]["sequence"] == \
         ["JAVASCRIPT", "REACT", "NODE_JS", "POSTGRESQL", "GIT"]
+    assert "candidate {" in res["dsl"]
+    assert "ACCEPTED" in res["html"] and "Wednesday Addams" in res["markdown"]

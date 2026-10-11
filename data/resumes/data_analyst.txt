@@ -1,0 +1,6 @@
+Shuri Udaku
+shuri@wakanda.io
+Education: Bachelor of Science in Statistics
+1 year of experience in data analysis.
+Technical Skills:
+Python, Pandas, Matplotlib, SQL

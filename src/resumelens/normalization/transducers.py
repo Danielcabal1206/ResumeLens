@@ -118,3 +118,17 @@ def _transitions(fst: FST):
 def export_dot(fst: FST, path: str) -> None:
     """Escribe el diagrama en formato DOT (renderizar con graphviz:  dot -Tpng f.dot -o f.png)."""
     fst.write_as_dot(path)
+
+
+def export_all_dots(directory: str) -> list[str]:
+    """Exporta el FST global y un FST por categoría. Devuelve las rutas escritas."""
+    from pathlib import Path
+
+    out = Path(directory)
+    out.mkdir(parents=True, exist_ok=True)
+    written: list[str] = []
+    for name, fst in [("GLOBAL", GLOBAL_FST), *FSTS.items()]:
+        path = str(out / f"fst_{name.lower()}.dot")
+        export_dot(fst, path)
+        written.append(path)
+    return written

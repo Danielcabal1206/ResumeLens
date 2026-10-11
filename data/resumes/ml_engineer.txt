@@ -1,0 +1,6 @@
+Mary Jane Watson
+mjwatson@mail.com | +57 310 555 0199
+2 years of experience developing predictive models and data-processing pipelines.
+Education: Master of Science in Data Science
+Technical Skills:
+Python, Pandas, NumPy, Scikit-learn, TensorFlow, SQL, Git

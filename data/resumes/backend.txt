@@ -1,0 +1,7 @@
+Tony Stark
+tony@stark.tech | +1 212 970 4133
+linkedin.com/in/tony-stark
+5 years of experience building backend services.
+Bachelor of Engineering in Software
+Technical Skills:
+Java, Spring Boot, PostgreSQL, REST API, Docker, Git

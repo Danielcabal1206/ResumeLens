@@ -1,0 +1,8 @@
+Wednesday Addams
+wednesday@mail.com | +57 300 123 4567
+linkedin.com/in/wednesday-addams
+github.com/waddams
+Bachelor of Science in Computer Science
+3 years of experience developing web applications.
+Technical Skills:
+JS, React.js, NodeJS, Postgres, Git

@@ -1,0 +1,5 @@
+Peter Parker
+peter@dailybugle.com
+Intern. Some exposure to programming.
+Technical Skills:
+Python, Git

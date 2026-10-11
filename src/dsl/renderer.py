@@ -59,7 +59,7 @@ def render_html(model) -> str:
 <meta charset="utf-8">
 <title>ResumeLens - {e(s['name'])}</title>
 <style>
-body {{ font-family: sans-serif; max-width: 42rem; margin: 2rem auto; }}
+body {{ font-family: sans-serif; max-width: 42rem; margin: 2rem auto; color: #111; background: #fff; }}
 table {{ border-collapse: collapse; }}
 td, th {{ border: 1px solid #999; padding: .3rem .8rem; }}
 .accepted {{ color: #0a7a2f; font-weight: bold; }}
