@@ -1,0 +1,37 @@
+{
+  "name": [
+    "Tony Stark"
+  ],
+  "email": [
+    "tony@stark.tech"
+  ],
+  "phone": [
+    "+1 212 970 4133"
+  ],
+  "linkedin": [
+    "linkedin.com/in/tony-stark"
+  ],
+  "github": [],
+  "languages": [
+    "Java"
+  ],
+  "frameworks": [
+    "Spring Boot"
+  ],
+  "databases": [
+    "PostgreSQL"
+  ],
+  "education": [
+    "Bachelor of Engineering in Software\nTechnical"
+  ],
+  "experience": [
+    "5 years of experience"
+  ],
+  "tools": [
+    "Docker",
+    "Git"
+  ],
+  "other_qualifications": [
+    "REST API"
+  ]
+}

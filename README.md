@@ -2,7 +2,9 @@
 
 ResumeLens procesa currículums en texto plano y determina si las calificaciones **explícitas** en el currículum satisfacen un patrón formal asociado a un perfil profesional. No ordena candidatos ni toma decisiones de contratación.
 
-Cada etapa del pipeline usa un modelo de lenguajes formales distinto:
+```
+texto del CV → [1 Regex] → cadenas → [2 FST] → tokens canónicos ordenados → [3 Autómatas] → perfil + ACCEPTED/REJECTED → [4 DSL textX] → HTML/Markdown
+```
 
 | Etapa | Modelo formal | Herramienta | Qué hace |
 |---|---|---|---|
@@ -11,53 +13,68 @@ Cada etapa del pipeline usa un modelo de lenguajes formales distinto:
 | 3. Reconocimiento | Autómatas finitos (DFA/NFA/ε-NFA) | `pyformlang` | Decide si la secuencia canónica cumple el patrón de un perfil |
 | 4. Perfil del candidato | Gramática libre de contexto (DSL) | `textX` | Valida el perfil estructurado y genera la visualización HTML/Markdown |
 
+## Estado del proyecto (entrega esta noche)
+
+Avance global estimado: **~90%**. Código de las 4 etapas + pipeline listos. Falta sobre todo tests EBNF de la DSL y la presentación oral.
+
+| Fase | Avance | Estado | Hecho | Pendiente |
+|---|---|---|---|---|
+| **1. Extracción (regex)** | **100%** | Completo | Contacto, nombre, skills, educación, experiencia; `extract` / `explain` / JSON; tests | — |
+| **2. Normalización (FST)** | **100%** | Completo | Transductores pyformlang; 7-tupla; DOT; orden canónico; tests | — |
+| **3. Autómatas** | **100%** | Completo | 4 DFA en pyformlang; 5-tupla; tipo DFA justificado; DOT en `docs/diagrams/`; `classify_resume`; tests | — |
+| **4. DSL textX** | **~85%** | Casi listo | Gramática `.tx`, validador, HTML/MD, pipeline | Tests extra de gramática / EBNF en el informe |
+| **Pipeline** | **100%** | Completo | Une 1→2→DFA→DSL→HTML; CVs de ejemplo | — |
+| **UI** | **CLI 100%** | Completo | `python main.py data/resumes/fullstack.txt` | — |
+| **Literatura** | **100%** | Completo | `docs/literature_review.md` | — |
+| **Diseño de módulos** | **100%** | Completo | Contratos, README, I/O por etapa | — |
+| **Diagramas** | **100%** | Completo | DOT de FST y DFA en `docs/diagrams/` | PNG en póster si Graphviz está instalado |
+| **Póster** | **100%** | Completo | Entregable del equipo | — |
+| **Presentación 10 min EN** | **~0%** | Pendiente | — | Guion oral en inglés |
+
+## Ejecución
+
+```bash
+pip install -r requirements.txt
+python main.py data/resumes/fullstack.txt
+pytest
 ```
-texto del CV → [1 Regex] → cadenas → [2 FST] → tokens canónicos ordenados → [3 Autómatas] → perfil + ACCEPTED/REJECTED → [4 DSL textX] → HTML/Markdown
-```
 
-## Estado del proyecto
+Salida en `output/`: JSON (Etapa 1), `.rl` (DSL), Markdown y HTML.
 
-| Etapa | Estado | Hecho | Falta |
-|---|---|---|---|
-| 1. Regex |  Completo | Contacto (email, teléfono, LinkedIn, GitHub), lenguajes, frameworks, bases de datos, `extract()` y guardado JSON | Educación, experiencia, herramientas, otras calificaciones, nombre; explicación de cada regex; tests |
-| 2. Transductores |  Completo | Archivo `transducers.py` creado | Transformaciones propias, 7-tupla formal, diagramas, implementación con pyformlang, orden canónico, tests |
-| 3. Autómatas |  Pendiente | Archivo `profile_automata.py` creado | 4 patrones, tipo de autómata justificado, 5-tupla, diagramas, implementación, tests |
-| 4. DSL textX |  Pendiente | Carpeta `dsl/` creada | Gramática EBNF, `.tx`, validador, generador HTML/MD, tests |
-| Pipeline / UI |  Pendiente | `pipeline.py` y `main.py` creados | Unir las 4 etapas e interfaz |
-| Documentación |  Pendiente | Este README | Literatura, diseño, casos de prueba, póster, presentación (10 min, en inglés) 
-
-Las etapas 2, 3 y 4 pueden desarrollarse **en paralelo** usando los contratos definidos abajo.
+Currículums de ejemplo: `data/resumes/{fullstack,ml_engineer,backend,data_analyst,incomplete}.txt`.
 
 ## Contratos entre etapas
 
 ### Salida de la Etapa 1 (entrada de la Etapa 2 y 4)
 
-Diccionario con estas claves fijas. Si una categoría no se encuentra o aún no está implementada, su valor es una lista vacía.
+Diccionario con claves fijas. Si una categoría no aparece, su valor es `[]`.
 
 ```python
 {
-    "name": [],                 # nombre del candidato (por implementar)
+    "name": [],
     "email": [],
     "phone": [],
     "linkedin": [],
     "github": [],
-    "languages": [],            # JS, Python, Java...
-    "frameworks": [],           # React.js, sklearn, Tensor Flow...
-    "databases": [],            # Postgres, MongoDB...
-    "education": [],            # títulos académicos (por implementar)
-    "experience": [],           # "3 years of experience" (por implementar)
-    "tools": [],                # Git, Docker... (por implementar)
-    "other_qualifications": []  # REST API, machine learning model development (por implementar)
+    "languages": [],
+    "frameworks": [],
+    "databases": [],
+    "education": [],
+    "experience": [],
+    "tools": [],
+    "other_qualifications": [],
 }
 ```
 
-Cada valor es una lista de cadenas únicas, en orden de aparición, tal como aparecen en el texto (sin normalizar).
+Cada valor es una lista de cadenas únicas, en orden de aparición, **tal como aparecen en el texto** (sin normalizar).
 
-La Etapa 2 recibe como entrada las claves `languages + frameworks + databases + tools + other_qualifications`. El resto de claves va directo a la Etapa 4.
+La Etapa 2 recibe `languages + frameworks + databases + tools + other_qualifications`. El resto va a la Etapa 4.
 
 ### Tokens canónicos (salida de la Etapa 2, alfabeto Σ de la Etapa 3)
 
-| Categoría | Token canónico | Variantes que normaliza (ejemplos) |
+Fuente de verdad: `src/resumelens/contracts.py` (`CANONICAL`). Tokens en MAYÚSCULAS con guion bajo.
+
+| Categoría | Token canónico | Variantes (ejemplos) |
 |---|---|---|
 | Lenguaje | `JAVASCRIPT` | JS, Javascript, JavaScript |
 | Lenguaje | `TYPESCRIPT` | TS, Typescript |
@@ -90,103 +107,64 @@ La Etapa 2 recibe como entrada las claves `languages + frameworks + databases + 
 | Visualización | `TABLEAU` | Tableau |
 | DevOps | `DOCKER` | docker, Docker |
 
-Los tokens son MAYÚSCULAS con guion bajo. Cualquier extensión debe agregarse a esta tabla antes de usarse en la Etapa 2 o 3.
+Cualquier extensión se agrega **solo** en `contracts.py`.
 
 ## Perfiles profesionales
 
-Cada perfil se define como una secuencia de **categorías** (slots) en orden fijo. Ese orden es el **orden canónico** que la Etapa 2 aplica antes de enviar la secuencia a los autómatas. Un slot puede ser obligatorio (1 de varias opciones) u opcional (`?`).
+Cada perfil es una secuencia de slots en orden fijo (orden canónico de la Etapa 2). Un slot puede ser obligatorio u opcional.
 
 ### 1. Full Stack Developer (predefinido)
-Orden: Lenguaje → Frontend → Backend → Base de datos → API → Control de versiones
 
-| Slot | Opciones | Obligatorio |
-|---|---|---|
-| Lenguaje | `JAVASCRIPT`, `TYPESCRIPT` | Sí |
-| Frontend | `REACT`, `ANGULAR`, `VUE` | Sí |
-| Backend | `NODE_JS`, `EXPRESS`, `DJANGO`, `SPRING_BOOT` | Sí |
-| Base de datos | `POSTGRESQL`, `MYSQL`, `MONGODB`, `SQLITE` | Sí |
-| API | `REST_API` | No |
-| Control de versiones | `GIT` | Sí |
+Lenguaje → Frontend → Backend → Base de datos → API? → Git
 
 Ejemplo aceptado: `JAVASCRIPT REACT NODE_JS POSTGRESQL GIT`
 
 ### 2. Machine Learning Engineer (predefinido)
-Orden: Lenguaje → Manejo de datos → Modelos → Desarrollo ML → Base de datos → Control de versiones
 
-| Slot | Opciones | Obligatorio |
-|---|---|---|
-| Lenguaje | `PYTHON` | Sí |
-| Manejo de datos | `PANDAS`, `NUMPY` (una o ambas) | Sí |
-| Modelos | `SCIKIT_LEARN`, `TENSORFLOW`, `PYTORCH` (una o más, en ese orden) | Sí |
-| Desarrollo ML | `ML_MODEL_DEVELOPMENT` | No |
-| Base de datos | `SQL`, `POSTGRESQL`, `MYSQL` | Sí |
-| Control de versiones | `GIT` | Sí |
+Python → Pandas/NumPy → Scikit-learn/TensorFlow/PyTorch → ML_DEV? → SQL/Postgres/MySQL → Git
 
 Ejemplo aceptado: `PYTHON PANDAS TENSORFLOW POSTGRESQL GIT`
 
-### 3. Backend Developer (propuesto por el equipo, ingeniería de software)
-Orden: Lenguaje → Framework backend → Base de datos → API → Contenedores → Control de versiones
+### 3. Backend Developer (equipo, ingeniería de software)
 
-| Slot | Opciones | Obligatorio |
-|---|---|---|
-| Lenguaje | `PYTHON`, `JAVA`, `JAVASCRIPT`, `TYPESCRIPT` | Sí |
-| Framework backend | `DJANGO`, `FLASK`, `SPRING_BOOT`, `NODE_JS`, `EXPRESS` | Sí |
-| Base de datos | `POSTGRESQL`, `MYSQL`, `MONGODB`, `SQLITE` | Sí |
-| API | `REST_API` | Sí |
-| Contenedores | `DOCKER` | No |
-| Control de versiones | `GIT` | Sí |
+Lenguaje → framework backend → base de datos → REST_API → Docker? → Git
 
 Ejemplo aceptado: `JAVA SPRING_BOOT POSTGRESQL REST_API DOCKER GIT`
 
-### 4. Data Analyst (propuesto por el equipo, IA/datos)
-Orden: Lenguaje → Manejo de datos → Visualización → Base de datos → Control de versiones
+### 4. Data Analyst (equipo, IA/datos)
 
-| Slot | Opciones | Obligatorio |
-|---|---|---|
-| Lenguaje | `PYTHON`, `R` | Sí |
-| Manejo de datos | `PANDAS`, `NUMPY` | Sí |
-| Visualización | `MATPLOTLIB`, `POWER_BI`, `TABLEAU` | Sí |
-| Base de datos | `SQL`, `POSTGRESQL`, `MYSQL` | Sí |
-| Control de versiones | `GIT` | No |
+Python/R → Pandas/NumPy → Matplotlib/Power BI/Tableau → SQL/Postgres/MySQL → Git?
 
 Ejemplo aceptado: `PYTHON PANDAS MATPLOTLIB SQL`
 
-> **Nota:** los perfiles 3 y 4 son una **propuesta provisional**. El enunciado indica que los requisitos de los perfiles propios se entregan por separado; ajustar esta sección cuando se tengan.
+Definición ejecutable: `PROFILES` en `contracts.py`.
 
 ## Estructura del proyecto
 
 ```
 ResumeLens/
-├── data/
-│   ├── profiles/        # definición de los 4 perfiles
-│   └── resumes/         # currículums de ejemplo
-├── docs/                # diseño, diagramas, póster, literatura
+├── data/resumes/
+├── docs/
+│   ├── literature_review.md
+│   └── diagrams/              # DOT de FST y DFA
+├── output/
 ├── src/
-│   ├── dsl/                    # Etapa 4: gramática textX, validador, generador HTML/MD
+│   ├── dsl/
 │   └── resumelens/
-│       ├── extraction/regex_extractor.py     # Etapa 1
-│       ├── normalization/transducers.py      # Etapa 2
-│       ├── recognition/profile_automata.py   # Etapa 3
+│       ├── contracts.py
+│       ├── extraction/regex_extractor.py
+│       ├── normalization/transducers.py
+│       ├── recognition/profile_automata.py
 │       └── pipeline.py
 ├── test/
 ├── main.py
-├── requirements.txt     # pyformlang, textx, graphviz
+├── requirements.txt
 └── README.md
 ```
 
-## Ejecución
+## Equipo
 
-```bash
-pip install -r requirements.txt
-python main.py
-```
-
-## Equipo y responsabilidades
-
-| Integrante | Responsabilidad principal |
+| Área | Estado |
 |---|---|
-| 1 | Etapa 1 (regex) y Etapa 2 (transductores) |
-| 2 | Etapa 3 (autómatas) y pipeline |
-| 3 | Etapa 4 (textX + visualización), literatura y póster |
-
-Cada integrante escribe los tests, el diseño y los diagramas de su propia etapa.
+| Etapa 1, 2, 3, pipeline, literatura, diagramas | Listo |
+| DSL (EBNF en el informe) y presentación 10 min EN | Cierre del equipo |

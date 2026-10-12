@@ -1,0 +1,33 @@
+digraph {
+PANDAS_3 [is_start=False, is_final=False, peripheries=1, label="PANDAS_3"];
+PANDAS_4 [is_start=False, is_final=False, peripheries=1, label="PANDAS_4"];
+NUMPY_8 [is_start=False, is_final=True, peripheries=2, label="NUMPY_8"];
+NUMPY_5 [is_start=False, is_final=True, peripheries=2, label="NUMPY_5"];
+q0 [is_start=True, is_final=False, peripheries=1, label=q0];
+starting_q0 [label="", shape=None, height=0.0, width=0.0];
+NUMPY_2 [is_start=False, is_final=False, peripheries=1, label="NUMPY_2"];
+NUMPY_3 [is_start=False, is_final=False, peripheries=1, label="NUMPY_3"];
+NUMPY_6 [is_start=False, is_final=False, peripheries=1, label="NUMPY_6"];
+PANDAS_1 [is_start=False, is_final=False, peripheries=1, label="PANDAS_1"];
+PANDAS_6 [is_start=False, is_final=True, peripheries=2, label="PANDAS_6"];
+PANDAS_5 [is_start=False, is_final=False, peripheries=1, label="PANDAS_5"];
+NUMPY_4 [is_start=False, is_final=False, peripheries=1, label="NUMPY_4"];
+NUMPY_7 [is_start=False, is_final=False, peripheries=1, label="NUMPY_7"];
+PANDAS_2 [is_start=False, is_final=False, peripheries=1, label="PANDAS_2"];
+NUMPY_1 [is_start=False, is_final=False, peripheries=1, label="NUMPY_1"];
+PANDAS_3 -> PANDAS_4 [key=0, label="\"d\" -> []"];
+PANDAS_4 -> PANDAS_5 [key=0, label="\"a\" -> []"];
+q0 -> PANDAS_1 [key=0, label="\"p\" -> [\"PANDAS\"]"];
+q0 -> NUMPY_1 [key=0, label="\"n\" -> [\"NUMPY\"]"];
+starting_q0 -> q0 [key=0];
+NUMPY_2 -> NUMPY_3 [key=0, label="\"m\" -> []"];
+NUMPY_3 -> NUMPY_4 [key=0, label="\"p\" -> []"];
+NUMPY_3 -> NUMPY_6 [key=0, label="\" \" -> []"];
+NUMPY_6 -> NUMPY_7 [key=0, label="\"p\" -> []"];
+PANDAS_1 -> PANDAS_2 [key=0, label="\"a\" -> []"];
+PANDAS_5 -> PANDAS_6 [key=0, label="\"s\" -> []"];
+NUMPY_4 -> NUMPY_5 [key=0, label="\"y\" -> []"];
+NUMPY_7 -> NUMPY_8 [key=0, label="\"y\" -> []"];
+PANDAS_2 -> PANDAS_3 [key=0, label="\"n\" -> []"];
+NUMPY_1 -> NUMPY_2 [key=0, label="\"u\" -> []"];
+}

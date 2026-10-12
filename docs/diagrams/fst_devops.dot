@@ -1,0 +1,17 @@
+digraph {
+DOCKER_1 [is_start=False, is_final=False, peripheries=1, label="DOCKER_1"];
+q0 [is_start=True, is_final=False, peripheries=1, label=q0];
+starting_q0 [label="", shape=None, height=0.0, width=0.0];
+DOCKER_2 [is_start=False, is_final=False, peripheries=1, label="DOCKER_2"];
+DOCKER_6 [is_start=False, is_final=True, peripheries=2, label="DOCKER_6"];
+DOCKER_4 [is_start=False, is_final=False, peripheries=1, label="DOCKER_4"];
+DOCKER_5 [is_start=False, is_final=False, peripheries=1, label="DOCKER_5"];
+DOCKER_3 [is_start=False, is_final=False, peripheries=1, label="DOCKER_3"];
+DOCKER_1 -> DOCKER_2 [key=0, label="\"o\" -> []"];
+q0 -> DOCKER_1 [key=0, label="\"d\" -> [\"DOCKER\"]"];
+starting_q0 -> q0 [key=0];
+DOCKER_2 -> DOCKER_3 [key=0, label="\"c\" -> []"];
+DOCKER_4 -> DOCKER_5 [key=0, label="\"e\" -> []"];
+DOCKER_5 -> DOCKER_6 [key=0, label="\"r\" -> []"];
+DOCKER_3 -> DOCKER_4 [key=0, label="\"k\" -> []"];
+}

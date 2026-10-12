@@ -1,0 +1,34 @@
+{
+  "name": [
+    "Mary Jane Watson"
+  ],
+  "email": [
+    "mjwatson@mail.com"
+  ],
+  "phone": [
+    "+57 310 555 0199"
+  ],
+  "linkedin": [],
+  "github": [],
+  "languages": [
+    "Python",
+    "SQL"
+  ],
+  "frameworks": [
+    "Pandas",
+    "NumPy",
+    "Scikit-learn",
+    "TensorFlow"
+  ],
+  "databases": [],
+  "education": [
+    "Master of Science in Data Science"
+  ],
+  "experience": [
+    "2 years of experience"
+  ],
+  "tools": [
+    "Git"
+  ],
+  "other_qualifications": []
+}

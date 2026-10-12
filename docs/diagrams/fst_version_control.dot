@@ -1,0 +1,11 @@
+digraph {
+GIT_3 [is_start=False, is_final=True, peripheries=2, label="GIT_3"];
+q0 [is_start=True, is_final=False, peripheries=1, label=q0];
+starting_q0 [label="", shape=None, height=0.0, width=0.0];
+GIT_1 [is_start=False, is_final=False, peripheries=1, label="GIT_1"];
+GIT_2 [is_start=False, is_final=False, peripheries=1, label="GIT_2"];
+q0 -> GIT_1 [key=0, label="\"g\" -> [\"GIT\"]"];
+starting_q0 -> q0 [key=0];
+GIT_1 -> GIT_2 [key=0, label="\"i\" -> []"];
+GIT_2 -> GIT_3 [key=0, label="\"t\" -> []"];
+}

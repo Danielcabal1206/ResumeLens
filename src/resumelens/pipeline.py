@@ -1,4 +1,4 @@
-"""Une las 4 etapas: regex → FST → (autómatas o oráculo) → DSL textX → HTML/MD."""
+"""Une las 4 etapas: regex → FST → autómatas → DSL textX → HTML/MD."""
 from __future__ import annotations
 
 from pathlib import Path
@@ -7,39 +7,15 @@ from textx import metamodel_from_file
 
 from dsl.renderer import render_html, render_markdown
 from dsl.validator import validate
-from resumelens.contracts import (
-    CANONICAL,
-    CATEGORY_TO_KEY,
-    PROFILES,
-    canonical_sequence,
-    profile_accepts,
-)
+from resumelens.contracts import CANONICAL, CATEGORY_TO_KEY
 from resumelens.extraction.regex_extractor import extract, save as save_extracted
 from resumelens.normalization.transducers import normalize_all
+from resumelens.recognition.profile_automata import classify_resume
 
 GRAMMAR = Path(__file__).resolve().parents[1] / "dsl" / "candidate_profile.tx"
 
 
-def _oracle_classify_resume(tokens: list[str]) -> dict[str, dict]:
-    """Clasificación de respaldo (misma semántica que contracts.PROFILES).
-    La Etapa 3 debe reemplazar esto con autómatas pyformlang vía classify_resume()."""
-    out = {}
-    for profile in PROFILES:
-        seq = canonical_sequence(tokens, profile)
-        out[profile] = {
-            "result": "ACCEPTED" if profile_accepts(profile, seq) else "REJECTED",
-            "sequence": seq,
-        }
-    return out
-
-
 def classify_profiles(tokens: list[str]) -> dict[str, dict]:
-    try:
-        from resumelens.recognition.profile_automata import classify_resume
-    except (ImportError, AttributeError):
-        return _oracle_classify_resume(tokens)
-    if not callable(classify_resume):
-        return _oracle_classify_resume(tokens)
     return classify_resume(tokens)
 
 

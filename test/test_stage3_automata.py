@@ -5,17 +5,10 @@ from itertools import combinations
 import pytest
 
 from resumelens.contracts import PROFILES, canonical_sequence, profile_accepts, profile_alphabet
-
-try:
-    from resumelens.recognition.profile_automata import (
-        AUTOMATA, accepted_profiles, automaton_type, classify_resume, explain_pattern,
-        export_dot, formal_definition, recognize,
-    )
-except ImportError:
-    pytest.skip("Etapa 3 (autómatas) pendiente", allow_module_level=True)
-
-if not AUTOMATA:
-    pytest.skip("Etapa 3 (autómatas) pendiente", allow_module_level=True)
+from resumelens.recognition.profile_automata import (
+    AUTOMATA, accepted_profiles, automaton_type, classify_resume, explain_pattern,
+    export_dot, formal_definition, recognize,
+)
 
 PROFILE_NAMES = list(PROFILES)
 

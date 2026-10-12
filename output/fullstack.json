@@ -1,0 +1,37 @@
+{
+  "name": [
+    "Wednesday Addams"
+  ],
+  "email": [
+    "wednesday@mail.com"
+  ],
+  "phone": [
+    "+57 300 123 4567"
+  ],
+  "linkedin": [
+    "linkedin.com/in/wednesday-addams"
+  ],
+  "github": [
+    "github.com/waddams"
+  ],
+  "languages": [
+    "JS"
+  ],
+  "frameworks": [
+    "React.js",
+    "NodeJS"
+  ],
+  "databases": [
+    "Postgres"
+  ],
+  "education": [
+    "Bachelor of Science in Computer Science"
+  ],
+  "experience": [
+    "3 years of experience"
+  ],
+  "tools": [
+    "Git"
+  ],
+  "other_qualifications": []
+}
